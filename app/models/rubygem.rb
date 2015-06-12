@@ -1,5 +1,6 @@
 class Rubygem < ActiveRecord::Base
   include Patterns
+  include Searchable
 
   has_many :owners, through: :ownerships, source: :user
   has_many :ownerships, dependent: :destroy
@@ -33,7 +34,7 @@ class Rubygem < ActiveRecord::Base
     where("UPPER(name) = UPPER(?)", name.strip).limit(1)
   end
 
-  def self.search(query)
+  def self.legacy_search(query)
     conditions = <<-SQL
       versions.indexed and
         (UPPER(name) LIKE UPPER(:query) OR

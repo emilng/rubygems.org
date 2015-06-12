@@ -68,4 +68,15 @@ class SearchesControllerTest < ActionController::TestCase
     should respond_with :success
     should render_template :show
   end
+
+  context "with elasticsearch down" do
+    should "fallback to legacy search" do
+      requires_toxiproxy
+      Toxiproxy[:elasticsearch].down do
+        get :show, query: 'sinatra', es: 'true'
+        assert_response :success
+        assert page.has_content?('Advanced search is currently unavailable')
+      end
+    end
+  end
 end
